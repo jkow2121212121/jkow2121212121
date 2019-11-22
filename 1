@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Canvas Maze Game</title>
+</head>
+<body>
+<p>Move the dirt bike with arrow keys. Go through maze to get to green finish line. Collect red boxes along the way.</p>
+<section>
+<img id="myImg" src="dirtbike.jpg" alt="Dirt Bike" width="0" height="0">
+<div>
+<canvas id="canvas" width="482" height="482">
+</canvas>
+</div>
+
+<script type="text/javascript">
+//things left to do: 
+
+//after collect all gas box go to green square and when at green square end game
+
+
+
+//gas boxes
+var brickRowCount = 3;
+var brickColumnCount = 5;
+var brickWidth = 20;
+var brickHeight = 20;
+var brickPadding = 100;
+var brickOffsetTop = 50;
+var brickOffsetLeft = 70;
+var score = 0;
+
+var bricks = [];
+for(var c=0; c<brickColumnCount; c++) {
+  bricks[c] = [];
+  for(var r=0; r<brickRowCount; r++) {
+    bricks[c][r] = { x: 0, y: 0, status: 1 };
+  }
+}
+function collisionDetection() {
+  for(var c=0; c<brickColumnCount; c++) {
+    for(var r=0; r<brickRowCount; r++) {
+      var b = bricks[c][r];
+      if(b.status == 1) {
+        if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+          dy = dy;
+          b.status = 0;
+          score++;
+          if(score == brickRowCount*brickColumnCount) {
+            alert("YOU WIN, CONGRATS!");
+            document.location.reload();
+          }
+        }
+      }
+    }
+  }
+}
+function drawBricks() {
+  for(var c=0; c<brickColumnCount; c++) {
+    for(var r=0; r<brickRowCount; r++) {
+      if(bricks[c][r].status == 1) {
+        var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
+        var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
+        bricks[c][r].x = brickX;
+        bricks[c][r].y = brickY;
+        ctx.beginPath();
+        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        ctx.fillStyle = "#FF0000";
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  }
+}
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#E63C19";
+  ctx.fillText("Score: "+score, 30, 20);
+}
+
+//canvas stuff
+var canvas;
+var ctx;
+//dirt bike movement amount per key stroke
+var dx = 5;
+var dy = 5;
+//dirt bike start position
+var x = 100;
+var y = 5;
+//canvas size
+var WIDTH = 482;
+var HEIGHT = 482;
+//image
+var img = new Image();
+//collision for walls
+var collision = 0;
+
+
+
+//dirt bike image
+function rect(x,y,w,h) {
+ctx.beginPath();
+ctx.drawImage(myImg,x,y,30,25);
+ctx.closePath();
+ctx.fill();
+}
+//clear
+function clear() {
+ctx.clearRect(0, 0, WIDTH, HEIGHT);
+ctx.drawImage(img, 0, 0);
+}
+//maze image
+function init() {
+canvas = document.getElementById("canvas");
+ctx = canvas.getContext("2d");
+img.src = "maze.gif";
+return setInterval(draw, 10);
+}
+
+//key movement and collision
+function doKeyDown(evt){	
+  switch (evt.keyCode) {
+    case 38:  
+       if (y - dy > 0){ 
+        y -= dy;
+        clear();
+        checkcollision();
+        if (collision == 1){
+          y += dy;
+          collision = 0;
+        } 
+      }
+
+break;
+case 40:  
+if (y + dy < HEIGHT ){
+y += dy;
+clear();
+checkcollision();
+if (collision == 1){
+y -= dy;
+collision = 0;
+}
+}
+
+break;
+case 37:  
+if (x - dx > 0){
+x -= dx;
+clear();
+checkcollision();
+if (collision == 1){
+x += dx;
+collision = 0;
+}
+}
+break;
+case 39:  
+if ((x + dx < WIDTH)){
+x += dx;
+clear();
+checkcollision();
+if (collision == 1){
+x -= dx;
+collision = 0;
+}
+}
+break;
+}
+}
+//collision check
+function checkcollision() {
+var imgd = ctx.getImageData(x, y, 15, 15);
+var pix = imgd.data;
+for (var i = 0; n = pix.length, i < n; i += 4) {
+if (pix[i] == 0) {
+collision = 1;
+}
+}
+}
+//draw dirtbike
+function draw() {
+clear();
+ctx.fillStyle = "purple";
+rect(x, y, 10,10);
+drawBricks();
+drawScore();
+collisionDetection();
+}
+
+//code endgame button for green square
+
+init();
+window.addEventListener('keydown',doKeyDown,true);
+</script>
+</section>
+</body>
+</html>
